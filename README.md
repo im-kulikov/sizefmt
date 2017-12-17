@@ -1,7 +1,7 @@
 sizefmt
 =======
 
-Fork and fixed from [code.cloudfoundry.org/bytefmt](code.cloudfoundry.org/bytefmt)
+Fork and fixed from [code.cloudfoundry.org/bytefmt](http://code.cloudfoundry.org/bytefmt)
 
 Human-readable byte formatter.
 
