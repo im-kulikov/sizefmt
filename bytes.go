@@ -2,18 +2,21 @@ package sizefmt
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 const (
-	BYTE = 1.0 << (10 * iota)
-	KILOBYTE
-	MEGABYTE
-	GIGABYTE
-	TERABYTE
+	_ = 1.0 << (10 * iota) // ignore first value by assigning to blank identifier
+	KB
+	MB
+	GB
+	TB
+	PB
+	EB
+	ZB
+	YB
 )
 
 var (
@@ -28,32 +31,46 @@ var (
 //	K: Kilobyte
 //	B: Byte
 // The unit that results in the smallest number greater than or equal to 1 is always chosen.
-func ByteSize(bytes int64) string {
-	unit := ""
-	value := float32(bytes)
+func ByteSize(b float64) string {
+	var (
+		unit string
+		del  float64 = 1
+	)
 
 	switch {
-	case bytes >= TERABYTE:
+	case b >= YB:
+		unit = "Y"
+		del = YB
+	case b >= ZB:
+		unit = "Z"
+		del = ZB
+	case b >= EB:
+		unit = "E"
+		del = EB
+	case b >= PB:
+		unit = "P"
+		del = PB
+	case b >= TB:
 		unit = "T"
-		value = value / TERABYTE
-	case bytes >= GIGABYTE:
+		del = TB
+	case b >= GB:
 		unit = "G"
-		value = value / GIGABYTE
-	case bytes >= MEGABYTE:
+		del = GB
+	case b >= MB:
 		unit = "M"
-		value = value / MEGABYTE
-	case bytes >= KILOBYTE:
+		del = MB
+	case b >= KB:
 		unit = "K"
-		value = value / KILOBYTE
-	case bytes >= BYTE:
-		unit = "B"
-	case bytes == 0:
+		del = KB
+	case b == 0:
 		return "0"
+	default:
+		unit = "B"
 	}
-
-	stringValue := fmt.Sprintf("%.1f", value)
-	stringValue = strings.TrimSuffix(stringValue, ".0")
-	return fmt.Sprintf("%s%s", stringValue, unit)
+	return strings.TrimSuffix(
+		strconv.FormatFloat(b/del, 'f', 1, 32),
+		".0",
+	) + unit
 }
 
 // ToMegabytes parses a string formatted by ByteSize as megabytes.
@@ -62,8 +79,7 @@ func ToMegabytes(s string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-
-	return bytes / MEGABYTE, nil
+	return bytes / MB, nil
 }
 
 // ToBytes parses a string formatted by ByteSize as bytes.
@@ -82,15 +98,15 @@ func ToBytes(s string) (int64, error) {
 	unit := strings.ToUpper(parts[2])
 	switch unit[:1] {
 	case "T":
-		bytes = int64(value * TERABYTE)
+		bytes = int64(value * TB)
 	case "G":
-		bytes = int64(value * GIGABYTE)
+		bytes = int64(value * GB)
 	case "M":
-		bytes = int64(value * MEGABYTE)
+		bytes = int64(value * MB)
 	case "K":
-		bytes = int64(value * KILOBYTE)
+		bytes = int64(value * KB)
 	case "B":
-		bytes = int64(value * BYTE)
+		bytes = int64(value)
 	}
 
 	return bytes, nil

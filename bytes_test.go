@@ -6,18 +6,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func BenchmarkByteSize(b *testing.B) {
+	b.ResetTimer()
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		ByteSize(100000.90 * TB)
+	}
+}
+
 func TestBytes(t *testing.T) {
 
 	t.Run("ByteSize", func(t *testing.T) {
 		t.Run("Prints in the largest possible unit", func(t *testing.T) {
-			assert.Equal(t, "10T", ByteSize(10*TERABYTE))
-			assert.Equal(t, "10.5T", ByteSize(10.5*TERABYTE))
-			assert.Equal(t, "10G", ByteSize(10*GIGABYTE))
-			assert.Equal(t, "10.5G", ByteSize(10.5*GIGABYTE))
-			assert.Equal(t, "100M", ByteSize(100*MEGABYTE))
-			assert.Equal(t, "100.5M", ByteSize(100.5*MEGABYTE))
-			assert.Equal(t, "100K", ByteSize(100*KILOBYTE))
-			assert.Equal(t, "100.5K", ByteSize(100.5*KILOBYTE))
+			assert.Equal(t, "10T", ByteSize(10*TB))
+			assert.Equal(t, "10.5T", ByteSize(10.5*TB))
+			assert.Equal(t, "10G", ByteSize(10*GB))
+			assert.Equal(t, "10.5G", ByteSize(10.5*GB))
+			assert.Equal(t, "100M", ByteSize(100*MB))
+			assert.Equal(t, "100.5M", ByteSize(100.5*MB))
+			assert.Equal(t, "100K", ByteSize(100*KB))
+			assert.Equal(t, "100.5K", ByteSize(100.5*KB))
 			assert.Equal(t, "1B", ByteSize(1))
 		})
 
@@ -129,23 +138,23 @@ func TestBytes(t *testing.T) {
 
 			bytes, err = ToBytes("5K")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*KILOBYTE), bytes)
+			assert.Equal(t, int64(5*KB), bytes)
 
 			bytes, err = ToBytes("5M")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*MEGABYTE), bytes)
+			assert.Equal(t, int64(5*MB), bytes)
 
 			bytes, err = ToBytes("5m")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*MEGABYTE), bytes)
+			assert.Equal(t, int64(5*MB), bytes)
 
 			bytes, err = ToBytes("5G")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*GIGABYTE), bytes)
+			assert.Equal(t, int64(5*GB), bytes)
 
 			bytes, err = ToBytes("5T")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*TERABYTE), bytes)
+			assert.Equal(t, int64(5*TB), bytes)
 		})
 
 		t.Run("parses byte amounts that are float (e.g. 5.3KB)", func(t *testing.T) {
@@ -171,19 +180,19 @@ func TestBytes(t *testing.T) {
 
 			bytes, err = ToBytes("5MB")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*MEGABYTE), bytes)
+			assert.Equal(t, int64(5*MB), bytes)
 
 			bytes, err = ToBytes("5mb")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*MEGABYTE), bytes)
+			assert.Equal(t, int64(5*MB), bytes)
 
 			bytes, err = ToBytes("5GB")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*GIGABYTE), bytes)
+			assert.Equal(t, int64(5*GB), bytes)
 
 			bytes, err = ToBytes("5TB")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*TERABYTE), bytes)
+			assert.Equal(t, int64(5*TB), bytes)
 		})
 
 		t.Run("returns an error when the unit is missing", func(t *testing.T) {
@@ -205,7 +214,7 @@ func TestBytes(t *testing.T) {
 		t.Run("allows whitespace before and after the value", func(t *testing.T) {
 			bytes, err := ToBytes("\t\n\r 5MB ")
 			assert.NoError(t, err)
-			assert.Equal(t, int64(5*MEGABYTE), bytes)
+			assert.Equal(t, int64(5*MB), bytes)
 		})
 
 		t.Run("returns an error for negative values", func(t *testing.T) {
